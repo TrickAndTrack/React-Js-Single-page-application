@@ -107,13 +107,10 @@ const Register = () => {
                 dob: dob,
                 phonenumber: phonenumber,
                 pwd: pwd
-            });
-            alert("User Registation Successfully")
-        
-            // console.log(response?.data);
-            // console.log(response?.accessToken);
-            // console.log(JSON.stringify(response))
-            setSuccess(true);
+            }).then((response) => {
+                setSuccess(response.data)});
+    
+
             //clear state and controlled inputs
             //need value attrib on inputs for this
             setFirstName("");
@@ -127,7 +124,6 @@ const Register = () => {
             setPwd('');
             setMatchPwd('');
 
-            login();
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No Server Response');
@@ -139,18 +135,13 @@ const Register = () => {
             errRef.current.focus();
         }
     }
-
+    if(success)
+        {
+            login();
+        }
 
     return (
         <>
-            {success ? (
-                <section>
-                    <h1>Success!</h1>
-                    <p>
-                    <Link to="/Admin">Sign In</Link>
-                    </p>
-                </section>
-            ) : (
                 <section>
                     <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
                     <h1>Register</h1>
@@ -370,7 +361,6 @@ const Register = () => {
                         </span>
                     </p>
                 </section>
-            )}
         </>
     )
 }

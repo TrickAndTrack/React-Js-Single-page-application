@@ -2,12 +2,11 @@ import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/AuthProvider';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
-
+import Home from './Home';
 const LOGIN_URL = 'http://localhost:8080/api/v1/secured/login';
 
 const Login = () => {
   const { setAuth } = useContext(AuthContext);
-
 
   const emailRef = useRef();
   const errRef = useRef();
@@ -16,8 +15,9 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [pwd, setPwd] = useState('');
   const [errMsg, setErrMsg] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [roleUser, setUserRole] = useState('');
+  const [role, setPosts] = useState('');
+  const [success, setSuccess] = useState(false);	
+  const data = email;
 
   // localStorage.username = $("#username").val().trim();
   const adminScreen = async () => {
@@ -26,6 +26,13 @@ const Login = () => {
   }
   const userScreen = async () => {
     navigate('/Home');
+    return(
+      <>
+        <section>	
+          <Home message={data} />	
+        </section>	
+        </>
+    )
   }
 
   useEffect(() => {
@@ -39,31 +46,24 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get(LOGIN_URL, {
+        await axios.get(LOGIN_URL, {
         auth: {
           username: email,
           password: pwd
         }
-      })
-      .then(
-        response => setUserRole(response.data.authorities[0].authority))
-
-      // const role = roleUser.data.authorities[0].authority;
-
-      const accessToken = response?.data?.accessToken;
-      const roles = response?.data?.roles;
-      const data = roleUser.authorities[0];
-      setAuth({ email, pwd, roles, accessToken });
+      }).then((response)=>{
+        setPosts(response.data.authorities[0].authority);
+      
       setEmail("");
       setPwd("");
       setSuccess(true);
-
-      
-
-      if (data === "ADMIN") {
-        adminScreen();
+    });
+    if (role === "ADMIN") {
+     
+      adminScreen();
       }
       else {
+        
         userScreen();
       }
 
@@ -78,21 +78,20 @@ const Login = () => {
         setErrMsg("Login Failed");
       }
       errRef.current.focus();
+      
     }
-
+    // var role1=success.authority;
+    
   }
 
   return (
     <>
-      {success ? (
-        <section>
-          <span className="line">
-            <Link to="/Home">Sign Up</Link>
-          </span>
-        </section>
-
+    {success ? (	
+        <section>	
+          <Home message={data} />	
+        </section>	
       ) : (
-        <section>
+      <section>
           <p
             ref={errRef}
             className={errMsg ? "errmsg" : "offscreen"}
@@ -130,7 +129,7 @@ const Login = () => {
             </span>
           </p>
         </section>
-      )}
+        )}
     </>
   );
 }
